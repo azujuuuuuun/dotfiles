@@ -1,0 +1,42 @@
+[user]
+  name = azujuuuuuun
+  email = 35828118+azujuuuuuun@users.noreply.github.com
+[core]
+  editor = vim
+  excludesfile = ~/.gitignore_global
+  ignoreCase = false
+[alias]
+  br = branch
+  cm = commit
+  co = checkout
+  fe = fetch
+  pl = pull
+  ps = push
+  rs = reset --soft HEAD^
+  rh = reset --hard HEAD^
+  st = status
+  sw = switch
+[color]
+  ui = auto
+  branch = always
+  diff = always
+  grep = always
+  status = always
+[credential]
+  helper = osxkeychain
+[diff]
+  renames = true
+[fetch]
+  prune = true
+[grep]
+  lineNumber = true
+[init]
+  defaultBranch = main
+[merge]
+  ff = false
+[pull]
+  ff = only
+[push]
+  default = current
+[status]
+  showUntrackedFiles = all
