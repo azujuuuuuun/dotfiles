@@ -1,4 +1,3 @@
-inoremap <C-j> <Esc>
 nnoremap ; :
 nnoremap : ;
 syntax on
