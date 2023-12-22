@@ -1,53 +1,67 @@
-# zplug
+setopt auto_cd
+setopt auto_list
+setopt auto_menu
+setopt auto_pushd
+setopt combining_chars
+setopt correct
+setopt extended_history
+setopt hist_ignore_all_dups
+setopt hist_ignore_dups
+setopt hist_reduce_blanks
+setopt ignore_eof
+setopt magic_equal_subst
+setopt no_beep
+setopt nolistbeep
+setopt pushd_ignore_dups
+setopt share_history
+unsetopt caseglob
+
+alias ls='ls -G'
+alias rm='rm -i'
+
+export HISTFILE=$HOME/.zsh_history
+export HISTSIZE=100000
+export SAVEHIST=100000
+
+export ZPLUG_HOME=/opt/homebrew/opt/zplug
+
 source $ZPLUG_HOME/init.zsh
-
-zplug "plugins/git",   from:oh-my-zsh
-
-zplug "zsh-users/zsh-syntax-highlighting", defer:2
-
-zplug "zsh-users/zsh-completions"
 zplug "zsh-users/zsh-autosuggestions"
-
-zplug "yous/vanilli.sh"
-
-zplug "chrissicool/zsh-256color"
-
-# 未インストール項目をインストールする
+zplug "zsh-users/zsh-completions"
+zplug "zsh-users/zsh-syntax-highlighting", defer:2
 if ! zplug check --verbose; then
     printf "Install? [y/N]: "
     if read -q; then
         echo; zplug install
     fi
 fi
-
-# コマンドをリンクして、PATH に追加し、プラグインは読み込む
 zplug load
 
-# gitリポジトリの状態を表示する
-source "/usr/local/opt/zsh-git-prompt/zshrc.sh"
+PROMPT="%F{blue}%n@%m%f:%F{yellow}%~%f %#"
 
-# 色を初期化
-autoload -U colors
-colors
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# プロンプトの表示設定
-ZSH_THEME_GIT_PROMPT_PREFIX="("
-ZSH_THEME_GIT_PROMPT_SUFFIX=")"
-ZSH_THEME_GIT_PROMPT_SEPARATOR="|"
-ZSH_THEME_GIT_PROMPT_BRANCH="%{$fg_bold[green]%}"
-ZSH_THEME_GIT_PROMPT_STAGED="%{$fg[red]%}%{+%G%}"
-ZSH_THEME_GIT_PROMPT_CONFLICTS="%{$fg_bold[red]%}%{-%G%}"
-ZSH_THEME_GIT_PROMPT_CHANGED="%{$fg_bold[yellow]%}%{!%G%}"
-ZSH_THEME_GIT_PROMPT_BEHIND="%{<-%G%}"
-ZSH_THEME_GIT_PROMPT_AHEAD="%{->%G%}"
-ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg[blue]%}%{..%G%}"
-ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[green]%}%{ok%G%}"
+. "$HOME/.cargo/env"
 
-PROMPT='%{${fg[blue]}%}%n@%m%{${reset_color}%}:%{${fg_bold[yellow]}%}%~%{${reset_color}%}$(git_super_status)$RESET%#'
-# RPROMPT='%D{%G/%m/%d(%a)} %*'
-RPROMPT='%D{day%d} %*'
+function peco_history() {
+    BUFFER=`history -n 1 | tail -r  | awk '!a[$0]++' | peco`
+    CURSOR=$#BUFFER
+    zle reset-prompt
+}
+zle -N peco_history
+bindkey '^r' peco_history
 
+function peco_ghq() {
+  local repository=$(ghq list | peco)
+  if [[ -n "$repository" ]]; then
+    BUFFER="cd $(ghq root)/${repository}"
+    zle accept-line
+  fi
+  zle reset-prompt
+}
+zle -N peco_ghq
+bindkey '^g' peco_ghq
 
-# エイリアス
-alias ls='ls -G'
-alias rm='rm -i'
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
