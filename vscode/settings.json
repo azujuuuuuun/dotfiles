@@ -1,0 +1,22 @@
+{
+  "[javascript]": {
+    "editor.tabSize": 2
+  },
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer"
+  },
+  "[typescript]": {
+    "editor.tabSize": 2
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "vim.normalModeKeyBindings": [
+    {
+      "after": [":"],
+      "before": [";"]
+    }
+  ],
+  "vim.useSystemClipboard": true,
+  "workbench.colorTheme": "Monokai",
+  "workbench.startupEditor": "none"
+}
