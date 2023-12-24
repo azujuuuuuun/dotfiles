@@ -37,7 +37,47 @@ if ! zplug check --verbose; then
 fi
 zplug load
 
-PROMPT="%F{blue}%n@%m%f:%F{yellow}%~%f %#"
+autoload -Uz vcs_info
+precmd () {
+  vcs_info
+}
+setopt prompt_subst
+zstyle ':vcs_info:git:*' formats "(%F{green}%b%f|%F{red}%c%f%F{yellow}%u%f%m)"
+zstyle ':vcs_info:git:*' actionformats '(%F{green}%b%f|%a|%F{red}%c%f%F{yellow}%u%f%m)'
+zstyle ':vcs_info:git:*' check-for-changes true
+zstyle ':vcs_info:git:*' stagedstr "+"
+zstyle ':vcs_info:git:*' unstagedstr "!"
+zstyle ':vcs_info:git*+set-message:*' hooks git-untracked git-st git-clean
+function +vi-git-untracked(){
+    if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' ]] && \
+        git status --porcelain | grep -q '^?? ' 2> /dev/null ; then
+        hook_com[misc]+='.'
+    fi
+}
+function +vi-git-st() {
+    local ahead behind
+    local -a gitstatus
+
+    git rev-parse ${hook_com[branch]}@{upstream} >/dev/null 2>&1 || return 0
+
+    local -a ahead_and_behind=(
+        $(git rev-list --left-right --count HEAD...${hook_com[branch]}@{upstream} 2>/dev/null)
+    )
+
+    ahead=${ahead_and_behind[1]}
+    behind=${ahead_and_behind[2]}
+
+    (( $ahead )) && gitstatus+=( "+${ahead}" )
+    (( $behind )) && gitstatus+=( "-${behind}" )
+
+    hook_com[misc]+=${(j:/:)gitstatus}
+}
+function +vi-git-clean() {
+  if [[ -z $(git status --short 2> /dev/null) ]]; then
+    hook_com[misc]+='%F{green}ok%f'
+  fi
+}
+PROMPT='%F{blue}%n@%m%f:%F{yellow}%~%f$vcs_info_msg_0_%#'
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
